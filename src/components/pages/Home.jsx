@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "@emotion/styled";
-import Main from "../organisms/Main";
-import { Sidebar } from "../organisms/organism";
+import { Sidebar } from "../organisms/Sidebar";
+import Main from "../templates/Main";
 
 const Home = () => {
   return (

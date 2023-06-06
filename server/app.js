@@ -10,8 +10,11 @@ const jsonData = JSON.parse(rawData);
 
 // GraphQL 스키마 정의
 const typeDefs = gql`
+
   type Product {
-    category: String
+    id: Int
+    majorCategory: String
+    middleCategory: String
     name: String
     division: String
     os: String
@@ -21,7 +24,9 @@ const typeDefs = gql`
   }
 
   type Query {
-    product(first: Int): [Product]
+    allProduct: [Product]
+    product(first: Int, majorCategory: String, middleCategory: String): [Product]
+    productsByMiddleCategory(majorCategory: String): [Product]
   }
 `;
 
@@ -29,10 +34,28 @@ const typeDefs = gql`
 // 리졸버 함수 작성
 const resolvers = {
   Query: {
-    product: (_, { first }) => {
-      const products = jsonData.slice(0, first)
+    allProduct: () => {
+      const products = jsonData;
       return products;
     },
+    product: (_, { first, majorCategory, middleCategory }) => {
+      let products = jsonData.slice(0, first);
+      if (majorCategory !== 'all' && middleCategory !== 'all') {
+        products = jsonData.filter((product) => product.majorCategory === majorCategory && product.middleCategory === middleCategory).slice(0, first)
+      } else if (majorCategory !== 'all') {
+        products = jsonData.filter((product) => product.majorCategory === majorCategory).slice(0, first)
+      } else if (middleCategory !== 'all') {
+        products = jsonData.filter((product) => product.middleCategory === middleCategory).slice(0, first)
+      }
+
+      return products;
+    },
+
+    productsByMiddleCategory: (_, { majorCategory }) => {
+      const products = majorCategory === 'all' ? jsonData : jsonData.filter((product) => product.majorCategory === majorCategory)
+      return products
+    }
+
   },
 };
 
